@@ -1,0 +1,87 @@
+# Example task specification for VPS Dev Agent
+
+spec:
+  # Required: Clear description of what needs to be done
+  goal: "Add user authentication feature with JWT tokens"
+  
+  # Instructions for the LLM
+  instructions: |
+    1. Create a new authentication module in src/auth/
+    2. Implement JWT token generation and validation
+    3. Add middleware for protected routes
+    4. Create login/logout endpoints
+    5. Add password hashing with bcrypt
+  
+  # Constraints and requirements
+  constraints:
+    - "Use existing database models (User table)"
+    - "Follow existing code style and patterns"
+    - "Add proper error handling"
+    - "Include unit tests"
+  
+  # Expected output
+  expected_output: |
+    - src/auth/jwt.py - JWT utilities
+    - src/auth/middleware.py - Auth middleware
+    - src/auth/routes.py - Login/logout endpoints
+    - tests/auth/ - Unit tests
+  
+  # PARA context references
+  context:
+    project_id: null  # Will be set when added to queue
+    area_ids: []      # Relevant areas
+    resource_ids: []  # Relevant resources
+    include_archives: true
+    archive_limit: 3
+  
+  # Execution configuration
+  execution:
+    timeout_minutes: 30
+    max_attempts: 3
+    auto_retry: true
+    parallel_tasks: false
+  
+  # Security mode: conservative or yolo
+  security_mode: "conservative"
+  
+  # Validation commands to run after execution
+  validation:
+    commands:
+      - name: "Install dependencies"
+        command: "pip install -e ."
+        required: true
+        timeout: 60
+      - name: "Run tests"
+        command: "pytest tests/auth/ -v"
+        required: true
+        timeout: 120
+      - name: "Type check"
+        command: "mypy src/auth/ --ignore-missing-imports"
+        required: false
+        timeout: 60
+    require_all_pass: true
+    rollback_on_failure: true
+  
+  # File context
+  relevant_files:
+    - "src/models/user.py"
+    - "src/config.py"
+    - "requirements.txt"
+  
+  exclude_patterns:
+    - "*.pyc"
+    - "__pycache__/*"
+    - ".git/*"
+  
+  # LLM configuration
+  model: null  # Use default
+  temperature: 0.7
+  
+  # Metadata
+  metadata:
+    version: "1.0.0"
+    author: "developer"
+    tags:
+      - "feature"
+      - "authentication"
+      - "security"
