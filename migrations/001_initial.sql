@@ -67,7 +67,11 @@ CREATE TABLE IF NOT EXISTS tasks (
     started_at TIMESTAMP WITH TIME ZONE,
     completed_at TIMESTAMP WITH TIME ZONE,
     error_log TEXT,
-    result_summary TEXT
+    result_summary TEXT,
+    -- Kimi CLI specific fields
+    kimi_tokens_used INTEGER,
+    kimi_exit_code INTEGER,
+    llm_provider VARCHAR(50) DEFAULT 'kimi_cli'
 );
 
 -- Create indexes

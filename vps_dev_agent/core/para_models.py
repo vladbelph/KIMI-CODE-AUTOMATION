@@ -145,6 +145,11 @@ class Task(Base):
     error_log = Column(Text, nullable=True)
     result_summary = Column(Text, nullable=True)
     
+    # Kimi CLI specific fields
+    kimi_tokens_used = Column(Integer, nullable=True)
+    kimi_exit_code = Column(Integer, nullable=True)
+    llm_provider = Column(String(50), default="kimi_cli")  # kimi_cli, openai, anthropic, etc.
+    
     # Relationships
     project = relationship("Project", back_populates="tasks")
     

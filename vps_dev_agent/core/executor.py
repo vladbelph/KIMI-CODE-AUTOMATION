@@ -109,6 +109,11 @@ class TaskExecutor:
                 session.commit()
                 return ExecutionResult.FAILED
             
+            # Check if using kimi_cli provider
+            if task.llm_provider == "kimi_cli":
+                session.close()
+                return self._execute_with_kimi_cli(task_id)
+            
             # Setup execution context
             ctx = ExecutionContext(task=task, project=project, spec=spec)
             
@@ -396,6 +401,24 @@ class TaskExecutor:
                     all_passed = False
         
         return all_passed
+    
+    def _execute_with_kimi_cli(self, task_id: str) -> ExecutionResult:
+        """Execute task using Kimi CLI batch executor."""
+        from vps_dev_agent.bridges.kimi_cli import KimiBatchExecutor
+        
+        executor = KimiBatchExecutor(
+            database_url=self.db.database_url,
+            auto_apply=False,  # Use task's yolo_mode instead
+        )
+        
+        result = executor.execute_task(task_id)
+        
+        if result.success:
+            return ExecutionResult.SUCCESS
+        elif result.exit_code == 2:  # Needs clarification
+            return ExecutionResult.CANCELLED
+        else:
+            return ExecutionResult.FAILED
     
     def _rollback(self, ctx: ExecutionContext):
         """Rollback to backup."""

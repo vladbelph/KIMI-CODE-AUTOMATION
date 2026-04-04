@@ -42,8 +42,8 @@ def add_task(
     project_name: Optional[str] = typer.Option(None, "--project", "-p", help="Project name"),
     priority: int = typer.Option(5, "--priority", help="Task priority (1-10)"),
     yolo: bool = typer.Option(False, "--yolo", "-y", help="Enable YOLO mode"),
+    provider: str = typer.Option("kimi_cli", "--provider", help="LLM provider (kimi_cli, openai, anthropic)"),
     database_url: Optional[str] = typer.Option(None, "--database-url", "-d", help="Database URL"),
-):
     """Add a task to the queue from a spec file."""
     db_url = database_url or get_database_url()
     
@@ -87,6 +87,7 @@ def add_task(
             priority=priority,
             yolo_mode=yolo or spec.security_mode.value == "yolo",
             max_attempts=spec.execution.max_attempts,
+            llm_provider=provider,
         )
         
         session.add(task)
@@ -97,7 +98,8 @@ def add_task(
             f"Task ID: {task_id}\n"
             f"Project ID: {project_id}\n"
             f"Priority: {priority}\n"
-            f"YOLO Mode: {'Yes' if task.yolo_mode else 'No'}",
+            f"YOLO Mode: {'Yes' if task.yolo_mode else 'No'}\n"
+            f"Provider: {provider}",
             border_style="green"
         ))
         

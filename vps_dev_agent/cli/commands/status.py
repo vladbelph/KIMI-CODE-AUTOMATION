@@ -206,6 +206,12 @@ def task(
                 duration = task.completed_at - task.started_at
                 info_lines.append(f"[bold]Duration:[/bold] {duration}")
         
+        if task.kimi_tokens_used:
+            info_lines.append(f"[bold]Tokens Used:[/bold] {task.kimi_tokens_used}")
+        
+        if task.kimi_exit_code is not None:
+            info_lines.append(f"[bold]Exit Code:[/bold] {task.kimi_exit_code}")
+        
         if task.result_summary:
             info_lines.extend(["", f"[bold]Result:[/bold] {task.result_summary}"])
         
@@ -223,3 +229,65 @@ def task(
     
     finally:
         session.close()
+
+
+@app.command()
+def limits():
+    """Show Kimi CLI subscription limits and usage."""
+    from vps_dev_agent.bridges.kimi_cli import LimitChecker
+    
+    console.print(Panel(
+        "[bold cyan]Kimi CLI Subscription Status[/bold cyan]",
+        border_style="cyan"
+    ))
+    
+    checker = LimitChecker()
+    quota = checker.get_remaining_quota(force_refresh=True)
+    
+    if not quota:
+        console.print("[red]Could not retrieve quota information[/red]")
+        console.print("Make sure Kimi CLI is installed and authenticated")
+        return
+    
+    table = Table()
+    table.add_column("Metric", style="cyan")
+    table.add_column("Value", style="green")
+    
+    # Tier
+    tier_color = "green"
+    if quota.tier.value == "Free":
+        tier_color = "yellow"
+    elif quota.tier.value == "Pro":
+        tier_color = "blue"
+    
+    table.add_row("Tier", f"[{tier_color}]{quota.tier.value}[/{tier_color}]")
+    
+    # Requests
+    if quota.is_critical:
+        req_color = "red bold"
+    elif quota.is_near_limit:
+        req_color = "yellow"
+    else:
+        req_color = "green"
+    
+    table.add_row(
+        "Requests Remaining",
+        f"[{req_color}]{quota.requests_remaining}[/{req_color}]"
+    )
+    
+    # Tokens
+    table.add_row("Tokens Remaining", str(quota.tokens_remaining))
+    
+    # Last checked
+    table.add_row("Last Checked", quota.checked_at.strftime("%Y-%m-%d %H:%M:%S"))
+    
+    console.print(table)
+    
+    # Status message
+    if quota.is_critical:
+        console.print("\n[bold red]⚠ CRITICAL: Only {quota.requests_remaining} requests remaining![/bold red]")
+        console.print("[yellow]Queue will be paused until limit resets or subscription is upgraded.[/yellow]")
+    elif quota.is_near_limit:
+        console.print("\n[bold yellow]⚠ WARNING: Running low on requests ({quota.requests_remaining} left)[/bold yellow]")
+    else:
+        console.print("\n[bold green]✓ Quota healthy - ready to process tasks[/bold green]")
