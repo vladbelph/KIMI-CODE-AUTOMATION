@@ -10,6 +10,7 @@ from rich.panel import Panel
 from rich.progress import Progress, SpinnerColumn, TextColumn
 
 from vps_dev_agent.core.para_models import DatabaseManager
+from vps_dev_agent.cli.onboarding import run_onboarding
 from vps_dev_agent.utils.logger import get_logger
 
 app = typer.Typer()
@@ -172,3 +173,28 @@ def init_area(
     
     finally:
         session.close()
+        console.print(f"[green]✓ Area '{name}' created in project '{project_name}'[/green]")
+        
+    except Exception as e:
+        session.rollback()
+        console.print(f"[red]Failed to create area: {e}[/red]")
+        raise typer.Exit(1)
+    
+    finally:
+        session.close()
+
+
+@app.command(name="welcome")
+def init_welcome(
+    force: bool = typer.Option(False, "--force", "-f", help="Force re-run onboarding"),
+    interactive: bool = typer.Option(True, "--interactive/--no-interactive", help="Interactive mode"),
+):
+    """Run interactive onboarding wizard."""
+    if not interactive:
+        console.print("Non-interactive mode not supported for onboarding")
+        raise typer.Exit(1)
+    
+    success = run_onboarding(force=force)
+    
+    if not success:
+        raise typer.Exit(1)

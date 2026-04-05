@@ -1,9 +1,23 @@
-# VPS Dev Agent
+```
+╔══════════════════════════════════════════════════════════╗
+║                                                          ║
+║   ██╗   ██╗██████╗ ███████╗    ██████╗ ███████╗██╗   ██╗ ║
+║   ██║   ██║██╔══██╗██╔════╝    ██╔══██╗██╔════╝██║   ██║ ║
+║   ██║   ██║██████╔╝███████╗    ██║  ██║█████╗  ██║   ██║ ║
+║   ╚██╗ ██╔╝██╔═══╝ ╚════██║    ██║  ██║██╔══╝  ╚██╗ ██╔╝ ║
+║    ╚████╔╝ ██║     ███████║    ██████╔╝███████╗ ╚████╔╝  ║
+║     ╚═══╝  ╚═╝     ╚══════╝    ╚═════╝ ╚══════╝  ╚═══╝   ║
+║                                                          ║
+║         Autonomous AI Agent for Your VPS                 ║
+║                                                          ║
+╚══════════════════════════════════════════════════════════╝
+```
 
-Autonomous AI development agent for VPS with PARA knowledge management, spec-driven execution, and native Kimi Code CLI integration.
+**Autonomous AI development agent for VPS with PARA knowledge management, spec-driven execution, and native Kimi Code CLI integration.**
 
 ## Features
 
+- **Interactive Onboarding**: Step-by-step wizard for first-time setup with visual guides
 - **PARA Knowledge Management**: Organize projects, areas, resources, and archives with semantic search
 - **Spec-Driven Execution**: Define tasks in YAML specifications
 - **Kimi Code CLI Integration**: Native batch execution with subscription limit management
@@ -43,7 +57,27 @@ kimi login
 
 ## Quick Start
 
-### 1. Configure Database
+### 🚀 Interactive Onboarding (Recommended)
+
+Run the interactive wizard for first-time setup:
+
+```bash
+# Start the onboarding wizard
+agent init welcome
+```
+
+This will guide you through:
+1. ✅ Checking prerequisites (Python 3.11+, PostgreSQL, Git)
+2. 🗄️ Configuring database connection
+3. 🤖 Setting up Kimi Code CLI (optional)
+4. 📁 Creating your first project
+5. 📝 Generating a sample task spec
+
+### Manual Setup
+
+If you prefer manual configuration:
+
+#### 1. Configure Database
 
 ```bash
 # Set environment variable
@@ -53,7 +87,7 @@ export DATABASE_URL="postgresql://user:pass@localhost:5432/agent_db"
 agent config --database-url "postgresql://user:pass@localhost:5432/agent_db"
 ```
 
-### 2. Initialize Database
+#### 2. Initialize Database
 
 ```bash
 # Create tables
@@ -63,7 +97,7 @@ agent init db
 agent init db --force
 ```
 
-### 3. Run Diagnostics
+#### 3. Run Diagnostics
 
 ```bash
 # Check all systems
@@ -73,7 +107,7 @@ agent doctor all
 agent doctor kimi
 ```
 
-### 4. Create a Project
+#### 4. Create a Project
 
 ```bash
 # Register your project
@@ -163,14 +197,77 @@ agent status limits
 agent status task <task-id>
 ```
 
-## CLI Commands Reference
+## Onboarding & Welcome
 
-### Initialization
+The VPS Dev Agent includes an interactive onboarding wizard for first-time users.
+
+### First Run Experience
+
+When you run `agent init welcome`, the wizard will:
+
+1. **Splash Screen** - Display ASCII art logo and welcome message
+2. **Prerequisites Check** - Verify Python 3.11+, PostgreSQL, Git, and Kimi CLI
+3. **Database Setup** - Interactive configuration with connection testing
+4. **Kimi Auth** - Guide through Kimi Code CLI authentication (optional)
+5. **First Project** - Create your first project (optional)
+6. **Sample Spec** - Generate an example task specification
+7. **Finish** - Show next steps and tips
+
+### Re-running Onboarding
 
 ```bash
+# Force re-run the wizard
+agent init welcome --force
+
+# Or using the welcome command
+agent welcome start --force
+```
+
+### Brief Mode (Subsequent Runs)
+
+For quick status after initial setup:
+
+```bash
+agent welcome brief
+```
+
+This shows:
+- Minimal logo
+- Queue status (pending tasks)
+- Project count
+- Random tip
+
+### Visual Style
+
+The onboarding uses a modern terminal UI inspired by GSD, Gemini CLI, and Warp:
+
+| Color | Usage |
+|-------|-------|
+| Cyan | Primary accents, headers |
+| Magenta | Subheaders |
+| Green | Success messages, checkmarks |
+| Yellow | Warnings |
+| Red | Errors |
+| Dim White | Secondary text |
+
+## CLI Commands Reference
+
+### Initialization & Onboarding
+
+```bash
+# Interactive onboarding wizard (recommended for first run)
+agent init welcome [options]
+  --force                   # Force re-run onboarding
+
+# Manual initialization
 agent init db [options]                    # Initialize PostgreSQL database
 agent init project <name> [options]        # Register a project
 agent init area <project> <name> [options] # Create an area
+
+# Welcome commands
+agent welcome start                        # Start onboarding wizard
+agent welcome start --force                # Re-run onboarding
+agent welcome brief                        # Show brief status (for subsequent runs)
 ```
 
 ### Queue Management
@@ -413,13 +510,19 @@ agent batch run --auto-apply
 vps_dev_agent/
 ├── cli/                    # Command-line interface
 │   ├── main.py            # Entry point
-│   └── commands/          # Subcommands
-│       ├── init.py        # init db, init project, init area
-│       ├── run.py         # run task, run spec, run next
-│       ├── status.py      # dashboard, projects, task, limits
-│       ├── queue.py       # add, list, remove, clear
-│       ├── doctor.py      # diagnostic checks
-│       └── batch.py       # batch execution
+│   ├── commands/          # Subcommands
+│   │   ├── init.py        # init db, init project, init area
+│   │   ├── run.py         # run task, run spec, run next
+│   │   ├── status.py      # dashboard, projects, task, limits
+│   │   ├── queue.py       # add, list, remove, clear
+│   │   ├── doctor.py      # diagnostic checks
+│   │   ├── batch.py       # batch execution
+│   │   └── welcome.py     # onboarding commands
+│   └── onboarding/        # Onboarding wizard
+│       ├── ascii_art.py   # Logo and visual elements
+│       ├── wizard.py      # Interactive wizard
+│       ├── checker.py     # Prerequisites checker
+│       └── config.py      # Configuration setup
 ├── core/                   # Core logic
 │   ├── para_models.py     # PARA database models
 │   ├── spec_parser.py     # YAML spec parsing
@@ -453,7 +556,17 @@ The agent uses the PARA method for knowledge management:
 
 ## Best Practices
 
-### 1. Use Batch Mode for Multiple Tasks
+### 1. Use Onboarding Wizard for First Setup
+
+```bash
+# Run the interactive wizard instead of manual configuration
+agent init welcome
+
+# Re-run if you need to change configuration
+agent init welcome --force
+```
+
+### 2. Use Batch Mode for Multiple Tasks
 
 ```bash
 # Instead of running tasks one by one
@@ -542,6 +655,20 @@ psql $DATABASE_URL -c "SELECT 1"
 agent status limits
 
 # Wait for reset or upgrade at https://kimi.moonshot.cn
+```
+
+### Onboarding Issues
+
+```bash
+# If wizard fails, check prerequisites manually
+agent doctor all
+
+# Skip wizard and configure manually
+agent config --database-url <url>
+agent init db
+
+# Re-run wizard with force flag
+agent init welcome --force
 ```
 
 ## Development

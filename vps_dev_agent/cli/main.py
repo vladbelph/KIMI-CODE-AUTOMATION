@@ -11,7 +11,7 @@ from rich.panel import Panel
 from rich.table import Table
 
 # Import commands
-from vps_dev_agent.cli.commands import init, run, status, queue, doctor, batch
+from vps_dev_agent.cli.commands import init, run, status, queue, doctor, batch, welcome
 from vps_dev_agent import __version__
 
 # Create main app
@@ -30,6 +30,7 @@ app.add_typer(status.app, name="status", help="Check system status")
 app.add_typer(queue.app, name="queue", help="Manage task queue")
 app.add_typer(doctor.app, name="doctor", help="Run diagnostic checks")
 app.add_typer(batch.app, name="batch", help="Batch execution")
+app.add_typer(welcome.app, name="welcome", help="Onboarding and welcome")
 
 
 @app.callback()
